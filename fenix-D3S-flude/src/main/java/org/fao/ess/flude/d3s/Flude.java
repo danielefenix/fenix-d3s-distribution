@@ -12,6 +12,10 @@ import javax.inject.Inject;
 import java.sql.*;
 import java.util.*;
 
+/*
+* D3S recognize this class as DAO plugin because it extends WDSDatasetDao and because it is declared
+* within fenix-D3S-dist/dist/config/datasources.properties
+* */
 public class Flude extends WDSDatasetDao {
     private static final String[] masterTableColumns = new String[]{ "region", "subregion", "domain", "incomes", "country", "year", "tot_pop_1000", "tot_area", "desk_study", "gdpusd2012", "indicator", "itto", "comifac", "foreur", "montreal", "unece", "value", "ts", "tt"};
     private static final int[] masterTableColumnsJdbcType = new int[]{Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER, Types.REAL, Types.REAL, Types.VARCHAR, Types.REAL, Types.VARCHAR, Types.BOOLEAN, Types.BOOLEAN, Types.BOOLEAN, Types.BOOLEAN, Types.BOOLEAN, Types.REAL, Types.VARCHAR, Types.VARCHAR};
@@ -35,12 +39,16 @@ public class Flude extends WDSDatasetDao {
     private boolean initialized = false;
 
 
+    //Mandatory overrides
 
+    // 1 - get initialization status
     @Override
     public boolean init() {
         return !initialized;
     }
 
+    // 2 - proper init
+    // No assumption on how many instance i have, but each invocation pass the properties of datasources.properties
     @Override
     public void init(Map<String, String> properties) throws Exception {
         if (!initialized)
@@ -48,8 +56,12 @@ public class Flude extends WDSDatasetDao {
         initialized = true;
     }
 
+    // get entire data set
+
+    //passing the whole metadata
     @Override
     public Iterator<Object[]> loadData(MeIdentification resource) throws Exception {
+        //Get DSD from metadata
         DSD dsd = resource!=null ? resource.getDsd() : null;
         Collection<DSDColumn> columns = dsd!=null && dsd instanceof DSDDataset ? ((DSDDataset)dsd).getColumns() : null;
         if (columns==null)
@@ -61,6 +73,7 @@ public class Flude extends WDSDatasetDao {
 
         Connection connection = dataSource.getConnection();
         try {
+            //  buildQuery() take into considaration the column type
             PreparedStatement statement = connection.prepareStatement(buildQuery(columns));
             statement.setString(1, topic);
 
@@ -69,6 +82,12 @@ public class Flude extends WDSDatasetDao {
             try { connection.close(); } catch (SQLException e) { }
         }
     }
+
+    /*
+    pass the whole resource
+    data to save
+    override if should be an incremental storing
+    */
 
     @Override
     public void storeData(MeIdentification resource, Iterator<Object[]> data, boolean overwrite) throws Exception {

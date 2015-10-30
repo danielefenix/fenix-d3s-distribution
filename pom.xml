@@ -10,15 +10,16 @@
   <name>D3S</name>
   <url>http://fenix.fao.org</url>
 
+    <properties>
+        <postrges.version>9.3-1102-jdbc41</postrges.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <resteasy.version>3.0.6.Final</resteasy.version>
+        <jackson.version>2.3.2</jackson.version>
+    </properties>
+
     <modules>
-        <module>fenix-D3S-CountrySTAT</module>
         <module>fenix-D3S-FAOSTAT</module>
-        <module>fenix-D3S-UNECA</module>
-        <module>fenix-D3S-RLM</module>
         <module>fenix-D3S-flude</module>
-        <module>fenix-D3S-crowd</module>
-        <module>fenix-D3S-adam</module>
-        <module>fenix-D3S-gift</module>
         <module>fenix-D3S-dist</module>
     </modules>
 
